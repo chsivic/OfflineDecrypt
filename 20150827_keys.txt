@@ -1,0 +1,5 @@
+write encryption key: 6e 12 e6 3b 28 23 81 96 61 7a 64 07 0b 21 f6 57
+read encryption key: 79 4a ce a9 cf 63 c1 02 99 45 2b 0b 69 fb bf c6
+write hash key: a2 15 bc b2 44 1e a8 d0 57 46 1f 5b 60 e9 96 52 8e bd 26 6a
+read hash key: e1 5c 22 91 7d 94 d8 38 18 e7 07 b1 a4 05 42 e6 33 04 a6 fa
+
