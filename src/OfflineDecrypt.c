@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <pcap.h>
 
 #include <openssl/evp.h>
@@ -67,7 +68,7 @@ unsigned char WriteMacSecret[SHA1_DIGEST_LEN];
 
 unsigned char WriteKey[AES_BLOCK_SIZE];
 
-void hex_dump (unsigned char *pkt, unsigned pkt_len)
+void hex_dump (const unsigned char *pkt, unsigned pkt_len)
 {
     int i, j;
 
@@ -121,10 +122,10 @@ unsigned char atoh(unsigned char c){
     return 0;
 }
 
-int read_key_file(unsigned char *filename)
+int read_key_file(const char *filename)
 {
     FILE *fd;
-    unsigned char buffer[2048];
+    char buffer[2048];
     unsigned char mac_key[SHA1_DIGEST_LEN];
     unsigned char enc_key[AES_BLOCK_SIZE];
     unsigned char *ptr;
@@ -165,7 +166,7 @@ int read_key_file(unsigned char *filename)
     return 1;
 }
 
-int verify_packet(unsigned char *buffer, unsigned buffer_len)
+int verify_packet(const unsigned char *buffer, unsigned buffer_len)
 {
 
     EVP_CIPHER_CTX ctx;
@@ -176,15 +177,15 @@ int verify_packet(unsigned char *buffer, unsigned buffer_len)
     unsigned ciphertext_len;
 
     unsigned char *iv;
-    unsigned out1_len, out2_len;
+    int out1_len, out2_len;
     unsigned char cleartext_buf[2048];
     unsigned cleartext_len;
 
     unsigned char computed_mac[20];
-    unsigned computed_mac_len;
+    unsigned int computed_mac_len;
 
     unsigned char pad_len = 0;
-    unsigned cleartext_len_for_mac;
+    size_t cleartext_len_for_mac;
 
     unsigned char length_field_for_mac[2];
 
@@ -193,7 +194,7 @@ int verify_packet(unsigned char *buffer, unsigned buffer_len)
     record = (dtls_record_t *)(buffer+4);
 
     printf("Record:\n");
-    hex_dump((char *)record, buffer_len - 4);
+    hex_dump((unsigned char *)record, buffer_len - 4);
 
     ciphertext_len = ((record->len[0] << 8) | record->len[1]) - 16;
     iv = record->ciphertext;
@@ -274,7 +275,7 @@ int main(int argc, char *argv[])
     int            res;
 
     struct pcap_pkthdr *pkt_hdr;
-    uchar8             *pkt_data;
+    const uchar8             *pkt_data;
     uint32              pkt_count = 0;
 
     OpenSSL_add_all_algorithms();
@@ -300,7 +301,7 @@ int main(int argc, char *argv[])
     while ((res = pcap_next_ex(in_pkts, &pkt_hdr, &pkt_data)) > 0) {
 
         uint32      off            = 0;
-        uchar8      *buf           = pkt_data;
+        const uchar8 *buf = pkt_data;
 
         eth_hdr_t *eth_hdr = (eth_hdr_t *)NULL;
         vlan_hdr_t *vlan_hdr = (vlan_hdr_t *)NULL;
